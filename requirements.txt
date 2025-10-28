@@ -1,0 +1,70 @@
+# ============================================================================
+# AI Trading Arena - Requirements
+# Python 3.11+
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# Core Data & Exchange
+# ----------------------------------------------------------------------------
+python-binance==1.0.19          # Binance API wrapper
+ccxt==4.2.25                    # Unified exchange API (multi-exchange support)
+pandas==2.1.4                   # Data manipulation and analysis
+numpy==1.26.3                   # Numerical computing
+
+# ----------------------------------------------------------------------------
+# Technical Analysis
+# ----------------------------------------------------------------------------
+pandas-ta==0.3.14b0             # Technical analysis indicators (pure Python)
+# Note: Using pandas-ta instead of ta-lib (no compilation required)
+
+# ----------------------------------------------------------------------------
+# LLM APIs (Tier 1 - Priority Models)
+# ----------------------------------------------------------------------------
+openai==1.12.0                  # GPT-4 API
+anthropic==0.18.1               # Claude API
+groq==0.4.2                     # Llama via Groq (free tier)
+httpx==0.26.0                   # Modern HTTP client for DeepSeek API
+
+# ----------------------------------------------------------------------------
+# Async & Performance
+# ----------------------------------------------------------------------------
+aiohttp==3.9.3                  # Async HTTP requests
+tenacity==8.2.3                 # Elegant retry logic with exponential backoff
+
+# ----------------------------------------------------------------------------
+# Configuration & Environment
+# ----------------------------------------------------------------------------
+python-dotenv==1.0.1            # Load environment variables from .env
+pyyaml==6.0.1                   # YAML configuration files
+pydantic==2.6.1                 # Data validation and settings management
+pydantic-settings==2.1.0        # Settings management with pydantic
+
+# ----------------------------------------------------------------------------
+# Logging & Monitoring
+# ----------------------------------------------------------------------------
+loguru==0.7.2                   # Modern logging with colors and formatting
+rich==13.7.0                    # Rich terminal output for CLI dashboard
+
+# ----------------------------------------------------------------------------
+# Testing
+# ----------------------------------------------------------------------------
+pytest==8.0.0                   # Testing framework
+pytest-asyncio==0.23.5          # Async test support
+pytest-mock==3.12.0             # Mocking utilities
+pytest-cov==4.1.0               # Code coverage reports
+hypothesis==6.98.0              # Property-based testing
+
+# ----------------------------------------------------------------------------
+# Development Tools
+# ----------------------------------------------------------------------------
+black==24.1.1                   # Code formatter
+flake8==7.0.0                   # Linting
+mypy==1.8.0                     # Static type checking
+isort==5.13.2                   # Import sorting
+
+# ----------------------------------------------------------------------------
+# Utilities
+# ----------------------------------------------------------------------------
+python-dateutil==2.8.2          # Date/time utilities
+pytz==2024.1                    # Timezone support
+tabulate==0.9.0                 # Pretty-print tabular data
