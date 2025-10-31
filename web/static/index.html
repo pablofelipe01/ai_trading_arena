@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Trading Arena - Live Dashboard</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .status-running { background: #10b981; animation: pulse 2s infinite; }
+        .status-paused { background: #f59e0b; }
+        .status-stopped { background: #ef4444; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .model-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .model-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn {
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4">
+
+    <!-- Header -->
+    <div class="max-w-7xl mx-auto mb-6">
+        <div class="glass rounded-lg p-6 shadow-2xl">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-4xl font-bold text-white mb-2">🏆 AI Trading Arena</h1>
+                    <p class="text-white/80">Real-time Competition Dashboard</p>
+                </div>
+                <div class="text-right">
+                    <div class="flex items-center justify-end mb-2">
+                        <span class="status-indicator" id="status-indicator"></span>
+                        <span class="text-white font-semibold" id="status-text">Disconnected</span>
+                    </div>
+                    <div class="text-white/60 text-sm" id="session-info">No active session</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Control Panel -->
+    <div class="max-w-7xl mx-auto mb-6">
+        <div class="glass rounded-lg p-6 shadow-2xl">
+            <h2 class="text-2xl font-bold text-white mb-4">Control Panel</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="text-white/80 text-sm mb-2 block">Symbol</label>
+                    <input type="text" id="symbol-input" value="BTC/USDT"
+                           class="w-full px-4 py-2 rounded bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/40">
+                </div>
+                <div>
+                    <label class="text-white/80 text-sm mb-2 block">Max Rounds</label>
+                    <input type="number" id="rounds-input" placeholder="Unlimited"
+                           class="w-full px-4 py-2 rounded bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/40">
+                </div>
+                <div class="flex items-end">
+                    <button id="start-btn"
+                            class="btn w-full px-6 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded shadow-lg">
+                        ▶ Start Competition
+                    </button>
+                </div>
+                <div class="flex items-end gap-2">
+                    <button id="pause-btn" disabled
+                            class="btn w-full px-6 py-2 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                        ⏸ Pause
+                    </button>
+                    <button id="stop-btn" disabled
+                            class="btn w-full px-6 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                        ⏹ Stop
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Competition Stats -->
+    <div class="max-w-7xl mx-auto mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="metric-card glass rounded-lg p-6 shadow-lg">
+                <div class="text-white/60 text-sm mb-1">Current Round</div>
+                <div class="text-3xl font-bold text-white" id="current-round">0</div>
+            </div>
+            <div class="metric-card glass rounded-lg p-6 shadow-lg">
+                <div class="text-white/60 text-sm mb-1">Symbol</div>
+                <div class="text-3xl font-bold text-white" id="current-symbol">-</div>
+            </div>
+            <div class="metric-card glass rounded-lg p-6 shadow-lg">
+                <div class="text-white/60 text-sm mb-1">Last Update</div>
+                <div class="text-lg font-bold text-white" id="last-update">-</div>
+            </div>
+            <div class="metric-card glass rounded-lg p-6 shadow-lg">
+                <div class="text-white/60 text-sm mb-1">Active Models</div>
+                <div class="text-3xl font-bold text-white" id="active-models">0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Left Column: Equity Curves -->
+        <div class="lg:col-span-2">
+            <div class="glass rounded-lg p-6 shadow-2xl mb-6">
+                <h2 class="text-2xl font-bold text-white mb-4">📈 Live Equity Curves</h2>
+                <div id="equity-chart" class="bg-white rounded-lg" style="height: 400px;"></div>
+            </div>
+
+            <!-- Leaderboard -->
+            <div class="glass rounded-lg p-6 shadow-2xl">
+                <h2 class="text-2xl font-bold text-white mb-4">🏆 Leaderboard</h2>
+                <div id="leaderboard" class="space-y-3">
+                    <div class="text-white/60 text-center py-8">
+                        Start a competition to see the leaderboard
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Model Decisions -->
+        <div class="lg:col-span-1">
+            <div class="glass rounded-lg p-6 shadow-2xl">
+                <h2 class="text-2xl font-bold text-white mb-4">🤖 Latest Decisions</h2>
+                <div id="decisions" class="space-y-4">
+                    <div class="text-white/60 text-center py-8">
+                        Waiting for model decisions...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Log -->
+    <div class="max-w-7xl mx-auto mt-6">
+        <div class="glass rounded-lg p-6 shadow-2xl">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold text-white">📋 Event Log</h2>
+                <button id="clear-log-btn" class="px-4 py-1 text-sm bg-white/10 hover:bg-white/20 text-white rounded">
+                    Clear
+                </button>
+            </div>
+            <div id="event-log" class="bg-black/20 rounded p-4 h-48 overflow-y-auto font-mono text-sm text-white/80">
+                <div class="text-white/40">Waiting for events...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // WebSocket connection
+        let ws = null;
+        let reconnectInterval = null;
+        let equityData = {};
+        let roundNumbers = [];
+
+        // Initialize Plotly chart
+        function initChart() {
+            const layout = {
+                title: 'Portfolio Value Over Time',
+                xaxis: { title: 'Round', gridcolor: '#e5e7eb' },
+                yaxis: { title: 'Portfolio Value ($)', gridcolor: '#e5e7eb' },
+                paper_bgcolor: '#ffffff',
+                plot_bgcolor: '#f9fafb',
+                showlegend: true,
+                legend: { x: 0, y: 1 }
+            };
+
+            Plotly.newPlot('equity-chart', [], layout, { responsive: true });
+        }
+
+        // Update equity chart
+        function updateEquityChart(leaderboard) {
+            const traces = leaderboard.map(model => ({
+                x: roundNumbers,
+                y: equityData[model.model] || [],
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: model.model,
+                line: { width: 3 }
+            }));
+
+            Plotly.react('equity-chart', traces);
+        }
+
+        // Update leaderboard
+        function updateLeaderboard(leaderboard) {
+            const html = leaderboard.map((model, index) => {
+                const pnlClass = model.total_pnl >= 0 ? 'text-green-400' : 'text-red-400';
+                const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
+
+                return `
+                    <div class="model-card glass rounded-lg p-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">${medal}</span>
+                                <div>
+                                    <div class="text-white font-semibold">#${index + 1} ${model.model}</div>
+                                    <div class="text-white/60 text-sm">
+                                        Win Rate: ${(model.win_rate * 100).toFixed(1)}% |
+                                        Trades: ${model.total_trades}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xl font-bold text-white">$${model.portfolio_value.toFixed(2)}</div>
+                                <div class="${pnlClass} text-sm font-semibold">
+                                    ${model.total_pnl >= 0 ? '+' : ''}${model.total_pnl.toFixed(2)}%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('leaderboard').innerHTML = html;
+            document.getElementById('active-models').textContent = leaderboard.length;
+        }
+
+        // Add event to log
+        function addEventLog(message, type = 'info') {
+            const log = document.getElementById('event-log');
+            const time = new Date().toLocaleTimeString();
+            const colors = {
+                info: 'text-blue-300',
+                success: 'text-green-300',
+                error: 'text-red-300',
+                warning: 'text-yellow-300'
+            };
+
+            const entry = document.createElement('div');
+            entry.className = colors[type] || colors.info;
+            entry.textContent = `[${time}] ${message}`;
+
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // Connect to WebSocket
+        function connect() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws`;
+
+            addEventLog('Connecting to server...', 'info');
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => {
+                document.getElementById('status-indicator').className = 'status-indicator status-running';
+                document.getElementById('status-text').textContent = 'Connected';
+                addEventLog('✓ Connected to server', 'success');
+
+                if (reconnectInterval) {
+                    clearInterval(reconnectInterval);
+                    reconnectInterval = null;
+                }
+            };
+
+            ws.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                handleMessage(message);
+            };
+
+            ws.onclose = () => {
+                document.getElementById('status-indicator').className = 'status-indicator status-stopped';
+                document.getElementById('status-text').textContent = 'Disconnected';
+                addEventLog('✗ Disconnected from server', 'error');
+
+                // Attempt to reconnect
+                if (!reconnectInterval) {
+                    reconnectInterval = setInterval(() => {
+                        addEventLog('Attempting to reconnect...', 'warning');
+                        connect();
+                    }, 5000);
+                }
+            };
+
+            ws.onerror = (error) => {
+                addEventLog('WebSocket error occurred', 'error');
+            };
+        }
+
+        // Handle WebSocket messages
+        function handleMessage(message) {
+            switch (message.type) {
+                case 'state':
+                    handleStateUpdate(message.data);
+                    break;
+
+                case 'competition_started':
+                    addEventLog('🚀 Competition started!', 'success');
+                    handleStateUpdate(message.data);
+                    document.getElementById('start-btn').disabled = true;
+                    document.getElementById('pause-btn').disabled = false;
+                    document.getElementById('stop-btn').disabled = false;
+                    break;
+
+                case 'competition_stopped':
+                    addEventLog('⏹ Competition stopped', 'warning');
+                    handleStateUpdate(message.data);
+                    document.getElementById('start-btn').disabled = false;
+                    document.getElementById('pause-btn').disabled = true;
+                    document.getElementById('stop-btn').disabled = true;
+                    break;
+
+                case 'competition_paused':
+                    addEventLog('⏸ Competition paused', 'warning');
+                    document.getElementById('status-indicator').className = 'status-indicator status-paused';
+                    break;
+
+                case 'competition_resumed':
+                    addEventLog('▶ Competition resumed', 'success');
+                    document.getElementById('status-indicator').className = 'status-indicator status-running';
+                    break;
+
+                case 'round_start':
+                    addEventLog(`📊 Round ${message.data.round} started`, 'info');
+                    document.getElementById('current-round').textContent = message.data.round;
+                    document.getElementById('last-update').textContent = new Date().toLocaleTimeString();
+                    break;
+
+                case 'round_complete':
+                    addEventLog(`✓ Round ${message.data.round} completed`, 'success');
+                    handleRoundComplete(message.data);
+                    break;
+
+                case 'competition_finished':
+                    addEventLog(`🏁 Competition finished! Total rounds: ${message.data.total_rounds}`, 'success');
+                    document.getElementById('start-btn').disabled = false;
+                    document.getElementById('pause-btn').disabled = true;
+                    document.getElementById('stop-btn').disabled = true;
+                    break;
+
+                case 'error':
+                    addEventLog(`❌ Error in round ${message.data.round}: ${message.data.error}`, 'error');
+                    break;
+
+                case 'ping':
+                    // Keep-alive ping, no action needed
+                    break;
+            }
+        }
+
+        // Handle state update
+        function handleStateUpdate(state) {
+            document.getElementById('current-round').textContent = state.round || 0;
+            document.getElementById('current-symbol').textContent = state.symbol || '-';
+
+            if (state.session_id) {
+                document.getElementById('session-info').textContent = `Session: ${state.session_id}`;
+            }
+
+            if (state.running) {
+                document.getElementById('status-indicator').className = state.paused
+                    ? 'status-indicator status-paused'
+                    : 'status-indicator status-running';
+                document.getElementById('status-text').textContent = state.paused ? 'Paused' : 'Running';
+            } else {
+                document.getElementById('status-indicator').className = 'status-indicator status-stopped';
+                document.getElementById('status-text').textContent = 'Stopped';
+            }
+        }
+
+        // Handle round complete
+        function handleRoundComplete(data) {
+            const { round, leaderboard } = data;
+
+            // Update round numbers
+            if (!roundNumbers.includes(round)) {
+                roundNumbers.push(round);
+            }
+
+            // Update equity data
+            leaderboard.forEach(model => {
+                if (!equityData[model.model]) {
+                    equityData[model.model] = [];
+                }
+                equityData[model.model].push(model.portfolio_value);
+            });
+
+            // Update charts and leaderboard
+            updateEquityChart(leaderboard);
+            updateLeaderboard(leaderboard);
+
+            document.getElementById('last-update').textContent = new Date().toLocaleTimeString();
+        }
+
+        // API calls
+        async function startCompetition() {
+            const symbol = document.getElementById('symbol-input').value;
+            const rounds = document.getElementById('rounds-input').value;
+
+            const config = {
+                symbol: symbol,
+                rounds: rounds ? parseInt(rounds) : null
+            };
+
+            try {
+                const response = await fetch('/api/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(config)
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    addEventLog(`Error: ${data.error}`, 'error');
+                } else {
+                    // Reset data
+                    equityData = {};
+                    roundNumbers = [];
+                    initChart();
+                }
+            } catch (error) {
+                addEventLog(`Failed to start competition: ${error.message}`, 'error');
+            }
+        }
+
+        async function stopCompetition() {
+            try {
+                const response = await fetch('/api/stop', { method: 'POST' });
+                const data = await response.json();
+
+                if (data.error) {
+                    addEventLog(`Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                addEventLog(`Failed to stop competition: ${error.message}`, 'error');
+            }
+        }
+
+        async function pauseCompetition() {
+            try {
+                const response = await fetch('/api/pause', { method: 'POST' });
+                const data = await response.json();
+
+                if (data.error) {
+                    addEventLog(`Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                addEventLog(`Failed to pause competition: ${error.message}`, 'error');
+            }
+        }
+
+        // Event listeners
+        document.getElementById('start-btn').addEventListener('click', startCompetition);
+        document.getElementById('stop-btn').addEventListener('click', stopCompetition);
+        document.getElementById('pause-btn').addEventListener('click', pauseCompetition);
+        document.getElementById('clear-log-btn').addEventListener('click', () => {
+            document.getElementById('event-log').innerHTML = '<div class="text-white/40">Log cleared</div>';
+        });
+
+        // Initialize
+        initChart();
+        connect();
+    </script>
+</body>
+</html>

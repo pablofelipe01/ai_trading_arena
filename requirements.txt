@@ -21,7 +21,7 @@ ta==0.11.0                     # Technical analysis library (pure Python)
 # LLM APIs (Tier 1 - Priority Models)
 # ----------------------------------------------------------------------------
 openai==1.12.0                  # GPT-4 API
-anthropic==0.18.1               # Claude API
+anthropic==0.72.0               # Claude API (updated for Claude Sonnet 4.5)
 groq==0.4.2                     # Llama via Groq (free tier)
 httpx==0.26.0                   # Modern HTTP client for DeepSeek API
 
@@ -40,10 +40,18 @@ pydantic==2.6.1                 # Data validation and settings management
 pydantic-settings==2.1.0        # Settings management with pydantic
 
 # ----------------------------------------------------------------------------
+# Web Dashboard (PHASE 9)
+# ----------------------------------------------------------------------------
+fastapi==0.109.2                # Modern web framework for real-time dashboard
+uvicorn==0.27.1                 # ASGI server for FastAPI
+websockets==12.0                # WebSocket support for real-time updates
+
+# ----------------------------------------------------------------------------
 # Logging & Monitoring
 # ----------------------------------------------------------------------------
 loguru==0.7.2                   # Modern logging with colors and formatting
 rich==13.7.0                    # Rich terminal output for CLI dashboard
+click==8.1.7                    # CLI framework
 
 # ----------------------------------------------------------------------------
 # Testing
@@ -53,6 +61,15 @@ pytest-asyncio==0.23.5          # Async test support
 pytest-mock==3.12.0             # Mocking utilities
 pytest-cov==4.1.0               # Code coverage reports
 hypothesis==6.98.0              # Property-based testing
+psutil==5.9.8                   # System and process monitoring
+
+# ----------------------------------------------------------------------------
+# Visualization & Analytics
+# ----------------------------------------------------------------------------
+plotly==5.18.0                  # Interactive charts and dashboards
+kaleido==0.2.1                  # Static image export for plotly
+matplotlib==3.8.2               # Additional plotting (fallback)
+seaborn==0.13.1                 # Statistical data visualization
 
 # ----------------------------------------------------------------------------
 # Development Tools
