@@ -21,7 +21,7 @@ Usage:
 
 import json
 from datetime import datetime
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional, Union
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
@@ -40,10 +40,19 @@ class TradingDecision(BaseModel):
     Validated trading decision from LLM
 
     This is the expected format from all LLM models.
+    Supports multi-asset trading.
+
+    Level 1: Simple BUY/SELL/HOLD (no shorting)
+    Level 2+: Will add LONG/SHORT with derivatives
     """
 
+    symbol: Optional[str] = Field(
+        default=None,
+        description="Trading symbol (e.g., ETH/USDT) - required for multi-asset"
+    )
+
     action: Literal["BUY", "SELL", "HOLD"] = Field(
-        description="Trading action to take"
+        description="Trading action: BUY (open/add position), SELL (close/reduce position), HOLD (do nothing)"
     )
 
     confidence: float = Field(
@@ -61,7 +70,7 @@ class TradingDecision(BaseModel):
     position_size: float = Field(
         ge=0.0,
         le=1.0,
-        description="Fraction of capital to use (0-1)",
+        description="Fraction of capital to use (0-1) for BUY, or fraction of position to close for SELL",
     )
 
     stop_loss: Optional[float] = Field(
@@ -109,6 +118,7 @@ class TradingDecision(BaseModel):
     def validate_stop_loss_take_profit(self):
         """Ensure stop loss and take profit make sense"""
         if self.action == "BUY":
+            # For BUY (long) positions: stop_loss < entry < take_profit
             if self.stop_loss and self.take_profit:
                 if self.stop_loss >= self.take_profit:
                     raise ValueError(
@@ -116,15 +126,35 @@ class TradingDecision(BaseModel):
                         f"(got stop={self.stop_loss}, take={self.take_profit})"
                     )
 
-        elif self.action == "SELL":
-            if self.stop_loss and self.take_profit:
-                if self.stop_loss <= self.take_profit:
-                    raise ValueError(
-                        "For SELL: stop_loss must be > take_profit "
-                        f"(got stop={self.stop_loss}, take={self.take_profit})"
-                    )
-
         return self
+
+
+class MultiAssetDecisions(BaseModel):
+    """
+    Multiple trading decisions for multi-asset portfolio
+
+    Allows LLMs to make decisions across multiple assets in a single response.
+    """
+
+    decisions: List[TradingDecision] = Field(
+        min_length=1,
+        description="List of trading decisions for different assets"
+    )
+
+    @model_validator(mode="after")
+    def validate_symbols_unique(self):
+        """Ensure no duplicate symbols"""
+        symbols = [d.symbol for d in self.decisions if d.symbol]
+        if len(symbols) != len(set(symbols)):
+            raise ValueError("Duplicate symbols found in decisions")
+        return self
+
+    def get_decision_for_symbol(self, symbol: str) -> Optional[TradingDecision]:
+        """Get decision for a specific symbol"""
+        for decision in self.decisions:
+            if decision.symbol == symbol:
+                return decision
+        return None
 
 
 # ============================================================================
@@ -223,29 +253,37 @@ class TechnicalIndicators(BaseModel):
 
 
 def validate_llm_response(
-    response: str | Dict[str, Any],
+    response: Union[str, Dict[str, Any], List[Dict[str, Any]]],
     model_name: str = "unknown",
-) -> TradingDecision:
+    multi_asset: bool = False,
+) -> Union[TradingDecision, MultiAssetDecisions]:
     """
     Validate and parse LLM response
 
     Args:
-        response: Raw LLM response (JSON string or dict)
+        response: Raw LLM response (JSON string, dict, or list of dicts)
         model_name: Name of the model (for logging)
+        multi_asset: If True, expect array of decisions; if False, expect single decision
 
     Returns:
-        Validated TradingDecision object
+        Validated TradingDecision or MultiAssetDecisions object
 
     Raises:
         ValueError: If response is invalid
         json.JSONDecodeError: If response is not valid JSON
 
     Example:
+        >>> # Single asset
         >>> response = '{"action": "BUY", "confidence": 0.85, ...}'
         >>> decision = validate_llm_response(response, "deepseek")
         >>> print(decision.action)  # "BUY"
+
+        >>> # Multi-asset
+        >>> response = '[{"symbol": "ETH/USDT", "action": "BUY", ...}, ...]'
+        >>> decisions = validate_llm_response(response, "deepseek", multi_asset=True)
+        >>> print(len(decisions.decisions))  # 2
     """
-    logger.debug("Validating LLM response", model=model_name)
+    logger.debug("Validating LLM response", model=model_name, multi_asset=multi_asset)
 
     try:
         # Parse JSON if string
@@ -254,24 +292,49 @@ def validate_llm_response(
         else:
             data = response
 
-        # Validate with Pydantic
-        decision = TradingDecision(**data)
+        # Handle multi-asset (array) vs single asset
+        if multi_asset or isinstance(data, list):
+            # Multi-asset decision array
+            if not isinstance(data, list):
+                raise ValueError("Expected array of decisions for multi-asset mode")
 
-        logger.info(
-            "LLM response validated successfully",
-            model=model_name,
-            action=decision.action,
-            confidence=decision.confidence,
-        )
+            decisions = MultiAssetDecisions(decisions=[TradingDecision(**d) for d in data])
 
-        return decision
+            logger.info(
+                "Multi-asset LLM response validated successfully",
+                model=model_name,
+                num_decisions=len(decisions.decisions),
+                symbols=[d.symbol for d in decisions.decisions if d.symbol]
+            )
+
+            return decisions
+        else:
+            # Single asset decision
+            decision = TradingDecision(**data)
+
+            logger.info(
+                "LLM response validated successfully",
+                model=model_name,
+                action=decision.action,
+                confidence=decision.confidence,
+                symbol=decision.symbol
+            )
+
+            return decision
 
     except json.JSONDecodeError as e:
         logger.error(
             "Invalid JSON in LLM response",
             model=model_name,
             error=str(e),
-            response_preview=response[:200] if isinstance(response, str) else "N/A",
+            response_preview=response[:500] if isinstance(response, str) else "N/A",
+            response_length=len(response) if isinstance(response, str) else 0,
+        )
+        # Log full response for debugging
+        logger.debug(
+            "Full invalid response",
+            model=model_name,
+            response=response if isinstance(response, str) else str(response)
         )
         raise ValueError(f"Invalid JSON from {model_name}: {e}")
 

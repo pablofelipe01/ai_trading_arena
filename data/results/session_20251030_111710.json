@@ -1,0 +1,148 @@
+{
+  "session_id": "20251030_111710",
+  "session_start": "2025-10-30T11:17:10.612731",
+  "session_end": "2025-10-30T11:17:15.668611",
+  "symbol": "BTC/USDT",
+  "total_rounds": 2,
+  "config": {
+    "decision_interval": 5,
+    "capital_per_model": 100.0
+  },
+  "final_leaderboard": [
+    {
+      "provider": "deepseek",
+      "priority": 1,
+      "enabled": true,
+      "decisions_made": 0,
+      "trades_executed": 0,
+      "errors": 0,
+      "avg_latency": 0.0,
+      "last_decision": null,
+      "account_value": 100.0,
+      "return_pct": 0.0,
+      "win_rate": 0,
+      "total_trades": 0
+    },
+    {
+      "provider": "groq",
+      "priority": 2,
+      "enabled": true,
+      "decisions_made": 0,
+      "trades_executed": 0,
+      "errors": 0,
+      "avg_latency": 0.0,
+      "last_decision": null,
+      "account_value": 100.0,
+      "return_pct": 0.0,
+      "win_rate": 0,
+      "total_trades": 0
+    },
+    {
+      "provider": "openai",
+      "priority": 3,
+      "enabled": true,
+      "decisions_made": 0,
+      "trades_executed": 0,
+      "errors": 0,
+      "avg_latency": 0.0,
+      "last_decision": null,
+      "account_value": 100.0,
+      "return_pct": 0.0,
+      "win_rate": 0,
+      "total_trades": 0
+    },
+    {
+      "provider": "anthropic",
+      "priority": 4,
+      "enabled": true,
+      "decisions_made": 0,
+      "trades_executed": 0,
+      "errors": 0,
+      "avg_latency": 0.0,
+      "last_decision": null,
+      "account_value": 100.0,
+      "return_pct": 0.0,
+      "win_rate": 0,
+      "total_trades": 0
+    }
+  ],
+  "round_results": [],
+  "summary": {
+    "session_start": "2025-10-30T11:17:10.567068",
+    "session_duration_minutes": 0.08503233333333333,
+    "total_models": 4,
+    "total_decisions": 0,
+    "leaderboard": [
+      {
+        "provider": "deepseek",
+        "priority": 1,
+        "enabled": true,
+        "decisions_made": 0,
+        "trades_executed": 0,
+        "errors": 0,
+        "avg_latency": 0.0,
+        "last_decision": null,
+        "account_value": 100.0,
+        "return_pct": 0.0,
+        "win_rate": 0,
+        "total_trades": 0
+      },
+      {
+        "provider": "groq",
+        "priority": 2,
+        "enabled": true,
+        "decisions_made": 0,
+        "trades_executed": 0,
+        "errors": 0,
+        "avg_latency": 0.0,
+        "last_decision": null,
+        "account_value": 100.0,
+        "return_pct": 0.0,
+        "win_rate": 0,
+        "total_trades": 0
+      },
+      {
+        "provider": "openai",
+        "priority": 3,
+        "enabled": true,
+        "decisions_made": 0,
+        "trades_executed": 0,
+        "errors": 0,
+        "avg_latency": 0.0,
+        "last_decision": null,
+        "account_value": 100.0,
+        "return_pct": 0.0,
+        "win_rate": 0,
+        "total_trades": 0
+      },
+      {
+        "provider": "anthropic",
+        "priority": 4,
+        "enabled": true,
+        "decisions_made": 0,
+        "trades_executed": 0,
+        "errors": 0,
+        "avg_latency": 0.0,
+        "last_decision": null,
+        "account_value": 100.0,
+        "return_pct": 0.0,
+        "win_rate": 0,
+        "total_trades": 0
+      }
+    ],
+    "leader": {
+      "provider": "deepseek",
+      "priority": 1,
+      "enabled": true,
+      "decisions_made": 0,
+      "trades_executed": 0,
+      "errors": 0,
+      "avg_latency": 0.0,
+      "last_decision": null,
+      "account_value": 100.0,
+      "return_pct": 0.0,
+      "win_rate": 0,
+      "total_trades": 0
+    }
+  }
+}

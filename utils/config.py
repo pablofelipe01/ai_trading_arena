@@ -220,6 +220,10 @@ class LLMParametersConfig(BaseModel):
     temperature: float = Field(default=0.7, ge=0.0, le=2.0)
     max_tokens: int = Field(default=2000, gt=0)
     top_p: float = Field(default=0.95, ge=0.0, le=1.0)
+    max_retries: int = Field(default=3, gt=0)
+    retry_delay: float = Field(default=2.0, gt=0.0)
+    max_requests_per_minute: int = Field(default=100, gt=0)
+    timeout: int = Field(default=30, gt=0)
 
 
 class RateLimitConfig(BaseModel):
@@ -265,9 +269,9 @@ class ModelsConfig(BaseModel):
     """All LLM models configuration"""
 
     deepseek: Optional[LLMModelConfig] = None
-    llama: Optional[LLMModelConfig] = None
-    gpt4: Optional[LLMModelConfig] = None
-    claude: Optional[LLMModelConfig] = None
+    openai: Optional[LLMModelConfig] = None
+    anthropic: Optional[LLMModelConfig] = None
+    groq: Optional[LLMModelConfig] = None
     gemini: Optional[LLMModelConfig] = None
     qwen: Optional[LLMModelConfig] = None
 

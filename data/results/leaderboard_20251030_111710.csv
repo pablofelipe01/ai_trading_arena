@@ -1,0 +1,5 @@
+provider,priority,enabled,decisions_made,trades_executed,errors,avg_latency,last_decision,account_value,return_pct,win_rate,total_trades
+deepseek,1,True,0,0,0,0.0,,100.0,0.0,0,0
+groq,2,True,0,0,0,0.0,,100.0,0.0,0,0
+openai,3,True,0,0,0,0.0,,100.0,0.0,0,0
+anthropic,4,True,0,0,0,0.0,,100.0,0.0,0,0

@@ -75,7 +75,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-4xl font-bold text-white mb-2">🏆 AI Trading Arena</h1>
-                    <p class="text-white/80">Real-time Competition Dashboard</p>
+                    <p class="text-white/80">Level 1: Multi-Asset Trading Competition</p>
                 </div>
                 <div class="text-right">
                     <div class="flex items-center justify-end mb-2">
@@ -92,12 +92,7 @@
     <div class="max-w-7xl mx-auto mb-6">
         <div class="glass rounded-lg p-6 shadow-2xl">
             <h2 class="text-2xl font-bold text-white mb-4">Control Panel</h2>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                    <label class="text-white/80 text-sm mb-2 block">Symbol</label>
-                    <input type="text" id="symbol-input" value="BTC/USDT"
-                           class="w-full px-4 py-2 rounded bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/40">
-                </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label class="text-white/80 text-sm mb-2 block">Max Rounds</label>
                     <input type="number" id="rounds-input" placeholder="Unlimited"
@@ -131,8 +126,8 @@
                 <div class="text-3xl font-bold text-white" id="current-round">0</div>
             </div>
             <div class="metric-card glass rounded-lg p-6 shadow-lg">
-                <div class="text-white/60 text-sm mb-1">Symbol</div>
-                <div class="text-3xl font-bold text-white" id="current-symbol">-</div>
+                <div class="text-white/60 text-sm mb-1">Trading Assets</div>
+                <div class="text-xl font-bold text-white" id="current-assets">-</div>
             </div>
             <div class="metric-card glass rounded-lg p-6 shadow-lg">
                 <div class="text-white/60 text-sm mb-1">Last Update</div>
@@ -244,7 +239,7 @@
                                 <div>
                                     <div class="text-white font-semibold">#${index + 1} ${model.model}</div>
                                     <div class="text-white/60 text-sm">
-                                        Win Rate: ${(model.win_rate * 100).toFixed(1)}% |
+                                        Win Rate: ${model.win_rate.toFixed(1)}% |
                                         Trades: ${model.total_trades}
                                     </div>
                                 </div>
@@ -390,10 +385,18 @@
         // Handle state update
         function handleStateUpdate(state) {
             document.getElementById('current-round').textContent = state.round || 0;
-            document.getElementById('current-symbol').textContent = state.symbol || '-';
+
+            // Display multi-asset symbols
+            if (state.symbols && state.symbols.length > 0) {
+                const symbolList = state.symbols.map(s => s.split('/')[0]).join(', ');
+                document.getElementById('current-assets').textContent = symbolList;
+            } else {
+                document.getElementById('current-assets').textContent = '-';
+            }
 
             if (state.session_id) {
-                document.getElementById('session-info').textContent = `Session: ${state.session_id}`;
+                const levelText = state.level === 'level1_multi_asset' ? 'Level 1 Multi-Asset' : state.level;
+                document.getElementById('session-info').textContent = `${levelText} | Session: ${state.session_id}`;
             }
 
             if (state.running) {
@@ -433,11 +436,9 @@
 
         // API calls
         async function startCompetition() {
-            const symbol = document.getElementById('symbol-input').value;
             const rounds = document.getElementById('rounds-input').value;
 
             const config = {
-                symbol: symbol,
                 rounds: rounds ? parseInt(rounds) : null
             };
 

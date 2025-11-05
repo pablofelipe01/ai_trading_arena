@@ -1,0 +1,256 @@
+{
+  "session_id": "20251104_152512",
+  "session_start": "2025-11-04T15:25:12.486769",
+  "session_end": "2025-11-04T15:25:17.195371",
+  "level": "level1_multi_asset",
+  "symbols": [
+    "ETH/USDT",
+    "SOL/USDT",
+    "BNB/USDT",
+    "ADA/USDT",
+    "XRP/USDT",
+    "DOGE/USDT",
+    "POL/USDT",
+    "AVAX/USDT"
+  ],
+  "num_assets": 8,
+  "total_rounds": 1,
+  "config": {
+    "decision_interval": 180,
+    "capital_per_model": 100.0
+  },
+  "final_leaderboard": [
+    {
+      "provider": "deepseek",
+      "priority": 1,
+      "enabled": true,
+      "decisions_made": 0,
+      "trades_executed": 0,
+      "errors": 1,
+      "avg_latency": 0.0,
+      "last_decision": null,
+      "account_value": 100.0,
+      "return_pct": 0.0,
+      "win_rate": 0,
+      "total_trades": 0
+    },
+    {
+      "provider": "groq",
+      "priority": 2,
+      "enabled": true,
+      "decisions_made": 0,
+      "trades_executed": 0,
+      "errors": 1,
+      "avg_latency": 0.0,
+      "last_decision": null,
+      "account_value": 100.0,
+      "return_pct": 0.0,
+      "win_rate": 0,
+      "total_trades": 0
+    },
+    {
+      "provider": "openai",
+      "priority": 3,
+      "enabled": true,
+      "decisions_made": 0,
+      "trades_executed": 0,
+      "errors": 1,
+      "avg_latency": 0.0,
+      "last_decision": null,
+      "account_value": 100.0,
+      "return_pct": 0.0,
+      "win_rate": 0,
+      "total_trades": 0
+    },
+    {
+      "provider": "anthropic",
+      "priority": 4,
+      "enabled": true,
+      "decisions_made": 0,
+      "trades_executed": 0,
+      "errors": 1,
+      "avg_latency": 0.0,
+      "last_decision": null,
+      "account_value": 100.0,
+      "return_pct": 0.0,
+      "win_rate": 0,
+      "total_trades": 0
+    }
+  ],
+  "round_results": [
+    {
+      "round": 1,
+      "timestamp": "2025-11-04T15:25:17.183781",
+      "prices": {
+        "ETH/USDT": 3185.0,
+        "SOL/USDT": 151.99,
+        "BNB/USDT": 903.51,
+        "ADA/USDT": 0.5059,
+        "XRP/USDT": 2.131,
+        "DOGE/USDT": 0.1544,
+        "POL/USDT": 0.1558,
+        "AVAX/USDT": 15.3
+      },
+      "decisions": {
+        "deepseek": {
+          "num_decisions": 0,
+          "actions": []
+        },
+        "groq": {
+          "num_decisions": 0,
+          "actions": []
+        },
+        "openai": {
+          "num_decisions": 0,
+          "actions": []
+        },
+        "anthropic": {
+          "num_decisions": 0,
+          "actions": []
+        }
+      },
+      "executions": {
+        "deepseek": 0,
+        "groq": 0,
+        "openai": 0,
+        "anthropic": 0
+      },
+      "leaderboard": [
+        {
+          "provider": "deepseek",
+          "priority": 1,
+          "enabled": true,
+          "decisions_made": 0,
+          "trades_executed": 0,
+          "errors": 1,
+          "avg_latency": 0.0,
+          "last_decision": null,
+          "account_value": 100.0,
+          "return_pct": 0.0,
+          "win_rate": 0,
+          "total_trades": 0
+        },
+        {
+          "provider": "groq",
+          "priority": 2,
+          "enabled": true,
+          "decisions_made": 0,
+          "trades_executed": 0,
+          "errors": 1,
+          "avg_latency": 0.0,
+          "last_decision": null,
+          "account_value": 100.0,
+          "return_pct": 0.0,
+          "win_rate": 0,
+          "total_trades": 0
+        },
+        {
+          "provider": "openai",
+          "priority": 3,
+          "enabled": true,
+          "decisions_made": 0,
+          "trades_executed": 0,
+          "errors": 1,
+          "avg_latency": 0.0,
+          "last_decision": null,
+          "account_value": 100.0,
+          "return_pct": 0.0,
+          "win_rate": 0,
+          "total_trades": 0
+        },
+        {
+          "provider": "anthropic",
+          "priority": 4,
+          "enabled": true,
+          "decisions_made": 0,
+          "trades_executed": 0,
+          "errors": 1,
+          "avg_latency": 0.0,
+          "last_decision": null,
+          "account_value": 100.0,
+          "return_pct": 0.0,
+          "win_rate": 0,
+          "total_trades": 0
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "session_start": "2025-11-04T15:25:12.457427",
+    "session_duration_minutes": 0.07896755,
+    "total_models": 4,
+    "total_decisions": 0,
+    "leaderboard": [
+      {
+        "provider": "deepseek",
+        "priority": 1,
+        "enabled": true,
+        "decisions_made": 0,
+        "trades_executed": 0,
+        "errors": 1,
+        "avg_latency": 0.0,
+        "last_decision": null,
+        "account_value": 100.0,
+        "return_pct": 0.0,
+        "win_rate": 0,
+        "total_trades": 0
+      },
+      {
+        "provider": "groq",
+        "priority": 2,
+        "enabled": true,
+        "decisions_made": 0,
+        "trades_executed": 0,
+        "errors": 1,
+        "avg_latency": 0.0,
+        "last_decision": null,
+        "account_value": 100.0,
+        "return_pct": 0.0,
+        "win_rate": 0,
+        "total_trades": 0
+      },
+      {
+        "provider": "openai",
+        "priority": 3,
+        "enabled": true,
+        "decisions_made": 0,
+        "trades_executed": 0,
+        "errors": 1,
+        "avg_latency": 0.0,
+        "last_decision": null,
+        "account_value": 100.0,
+        "return_pct": 0.0,
+        "win_rate": 0,
+        "total_trades": 0
+      },
+      {
+        "provider": "anthropic",
+        "priority": 4,
+        "enabled": true,
+        "decisions_made": 0,
+        "trades_executed": 0,
+        "errors": 1,
+        "avg_latency": 0.0,
+        "last_decision": null,
+        "account_value": 100.0,
+        "return_pct": 0.0,
+        "win_rate": 0,
+        "total_trades": 0
+      }
+    ],
+    "leader": {
+      "provider": "deepseek",
+      "priority": 1,
+      "enabled": true,
+      "decisions_made": 0,
+      "trades_executed": 0,
+      "errors": 1,
+      "avg_latency": 0.0,
+      "last_decision": null,
+      "account_value": 100.0,
+      "return_pct": 0.0,
+      "win_rate": 0,
+      "total_trades": 0
+    }
+  }
+}

@@ -1,0 +1,331 @@
+{
+  "session_id": "20251030_112514",
+  "session_start": "2025-10-30T11:25:14.643911",
+  "session_end": "2025-10-30T11:26:07.269470",
+  "symbol": "BTC/USDT",
+  "total_rounds": 2,
+  "config": {
+    "decision_interval": 5,
+    "capital_per_model": 100.0
+  },
+  "final_leaderboard": [
+    {
+      "provider": "openai",
+      "priority": 3,
+      "enabled": true,
+      "decisions_made": 2,
+      "trades_executed": 0,
+      "errors": 2,
+      "avg_latency": 5.455832600593567,
+      "last_decision": "2025-10-30T11:26:05.375071",
+      "account_value": 100.0,
+      "return_pct": 0.0,
+      "win_rate": 0,
+      "total_trades": 0
+    },
+    {
+      "provider": "deepseek",
+      "priority": 1,
+      "enabled": true,
+      "decisions_made": 2,
+      "trades_executed": 2,
+      "errors": 0,
+      "avg_latency": 7.09040892124176,
+      "last_decision": "2025-10-30T11:26:06.067084",
+      "account_value": 48.915994036009,
+      "return_pct": -51.084005963991,
+      "win_rate": 0,
+      "total_trades": 2
+    },
+    {
+      "provider": "groq",
+      "priority": 2,
+      "enabled": true,
+      "decisions_made": 2,
+      "trades_executed": 2,
+      "errors": 0,
+      "avg_latency": 1.3586175441741943,
+      "last_decision": "2025-10-30T11:25:59.901887",
+      "account_value": 24.900050100025002,
+      "return_pct": -75.09994989997499,
+      "win_rate": 0,
+      "total_trades": 2
+    },
+    {
+      "provider": "anthropic",
+      "priority": 4,
+      "enabled": true,
+      "decisions_made": 2,
+      "trades_executed": 2,
+      "errors": 0,
+      "avg_latency": 22.54787290096283,
+      "last_decision": "2025-10-30T11:26:07.256944",
+      "account_value": 2.1992637890722513,
+      "return_pct": -97.80073621092775,
+      "win_rate": 0,
+      "total_trades": 2
+    }
+  ],
+  "round_results": [
+    {
+      "round": 1,
+      "timestamp": "2025-10-30T11:25:53.463832",
+      "price": 108012.4,
+      "decisions": {
+        "deepseek": {
+          "action": "BUY",
+          "confidence": 0.65,
+          "reasoning": "Current price of 108012.4 is above the EMA20 of 107889.147, indicating a potential uptrend. MACD is positive at 20.490 and rising, suggesting bullish momentum. RSI at 58.306 is neutral, not overbought. Recent price series show volatility but a general upward movement from lower levels, supporting a buy signal for short-term gains."
+        },
+        "groq": {
+          "action": "BUY",
+          "confidence": 0.7,
+          "reasoning": "The current RSI (7 period) is at 58.306, which is not in the overbought region. The MACD is at 20.490, indicating a bullish trend. Additionally, the EMA20 is at 107889.147, which is slightly below the current price, suggesting a potential buy signal. Considering these indicators, a buy action seems reasonable."
+        },
+        "openai": {
+          "action": "BUY",
+          "confidence": 0.85,
+          "reasoning": "The current BTCUSDT price is above the EMA20, indicating a potential uptrend. The MACD is positive and increasing, suggesting bullish momentum is building. RSI is at 58.306, which is not yet overbought, providing space for upward movement. These indicators collectively suggest a buy opportunity."
+        },
+        "anthropic": {
+          "action": "BUY",
+          "confidence": 0.72,
+          "reasoning": "Multiple technical indicators suggest a favorable entry point for a long position: 1) MACD has turned positive (20.490) after being deeply negative, indicating bullish momentum shift. 2) RSI at 59.693 shows strength without being overbought (below 70). 3) Price (108012.4) is above EMA20 (107889.147), confirming uptrend. 4) Recent price action shows recovery from the 107389 low with higher lows forming. 5) The 1-minute chart shows consolidation around 108000 level after testing lower support. 6) Volume profile suggests accumulation at current levels. The market appears to be in early recovery phase after a significant pullback from 111750+ levels. Risk/reward is favorable with stop loss below recent support and upside potential to retest 108500-109000 resistance levels."
+        }
+      },
+      "executions": {
+        "deepseek": true,
+        "groq": true,
+        "openai": false,
+        "anthropic": true
+      },
+      "leaderboard": [
+        {
+          "provider": "openai",
+          "priority": 3,
+          "enabled": true,
+          "decisions_made": 1,
+          "trades_executed": 0,
+          "errors": 1,
+          "avg_latency": 4.027180910110474,
+          "last_decision": "2025-10-30T11:25:21.159542",
+          "account_value": 100.0,
+          "return_pct": 0.0,
+          "win_rate": 0,
+          "total_trades": 0
+        },
+        {
+          "provider": "deepseek",
+          "priority": 1,
+          "enabled": true,
+          "decisions_made": 1,
+          "trades_executed": 1,
+          "errors": 0,
+          "avg_latency": 6.603026866912842,
+          "last_decision": "2025-10-30T11:25:23.734872",
+          "account_value": 69.93997,
+          "return_pct": -30.060029999999994,
+          "win_rate": 0,
+          "total_trades": 1
+        },
+        {
+          "provider": "groq",
+          "priority": 2,
+          "enabled": true,
+          "decisions_made": 1,
+          "trades_executed": 1,
+          "errors": 0,
+          "avg_latency": 1.3055930137634277,
+          "last_decision": "2025-10-30T11:25:18.437662",
+          "account_value": 49.899950000000004,
+          "return_pct": -50.100049999999996,
+          "win_rate": 0,
+          "total_trades": 1
+        },
+        {
+          "provider": "anthropic",
+          "priority": 4,
+          "enabled": true,
+          "decisions_made": 1,
+          "trades_executed": 1,
+          "errors": 0,
+          "avg_latency": 36.32966899871826,
+          "last_decision": "2025-10-30T11:25:53.462448",
+          "account_value": 14.829915,
+          "return_pct": -85.170085,
+          "win_rate": 0,
+          "total_trades": 1
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "timestamp": "2025-10-30T11:26:07.258682",
+      "price": 108012.4,
+      "decisions": {
+        "deepseek": {
+          "action": "BUY",
+          "confidence": 0.65,
+          "reasoning": "Current price of 108012.4 is above the EMA20 of 107889.147, indicating a potential uptrend. MACD is positive at 20.490 and rising, suggesting bullish momentum. RSI at 58.306 is neutral, not overbought, allowing room for upward movement. Recent price series show volatility but a general upward trend from lower levels, supporting a buy signal. However, high volatility and mixed signals in shorter timeframes temper confidence."
+        },
+        "groq": {
+          "action": "BUY",
+          "confidence": 0.7,
+          "reasoning": "The MACD indicator is showing a positive value (20.490) after being negative for several periods, indicating a potential bullish crossover. Additionally, the RSI (14-period) is at 59.693, which is close to the overbought region but not quite there, suggesting there might be room for further upward movement. The EMA-20 is also rising, supporting the potential for an upward trend. Given these indicators, it seems like a good time to enter a long position."
+        },
+        "openai": {
+          "action": "BUY",
+          "confidence": 0.7,
+          "reasoning": "The current BTCUSDT price is slightly above the EMA20, indicating a possible upward trend. The MACD is positive and increasing, suggesting bullish momentum. The RSI is moderately high but not overbought, indicating room for further upward movement. Given there are no open positions and available balance is fully utilized, a buy is recommended to capitalize on potential gains."
+        },
+        "anthropic": {
+          "action": "BUY",
+          "confidence": 0.72,
+          "reasoning": "Multiple technical indicators suggest a bullish reversal is underway. The RSI has recovered from oversold territory (16.393) to 59.693, indicating strong momentum shift. MACD has turned positive (20.490) after being deeply negative (-147.992), signaling a bullish crossover. Price is currently above the 20-period EMA (108012.4 > 107889.147), confirming upward trend. The 1-minute chart shows price stabilization around 108000 after a decline from 108300, suggesting support formation. The 3-minute and 15-minute timeframes show recent consolidation around current levels. Given this is the first trade with $100 available, entering a position with moderate size is appropriate. The recovery from the sharp drop to 107389 shows strong buying pressure. However, maintaining some caution due to recent volatility and the fact that price is still below recent highs around 108350."
+        }
+      },
+      "executions": {
+        "deepseek": true,
+        "groq": true,
+        "openai": false,
+        "anthropic": true
+      },
+      "leaderboard": [
+        {
+          "provider": "openai",
+          "priority": 3,
+          "enabled": true,
+          "decisions_made": 2,
+          "trades_executed": 0,
+          "errors": 2,
+          "avg_latency": 5.455832600593567,
+          "last_decision": "2025-10-30T11:26:05.375071",
+          "account_value": 100.0,
+          "return_pct": 0.0,
+          "win_rate": 0,
+          "total_trades": 0
+        },
+        {
+          "provider": "deepseek",
+          "priority": 1,
+          "enabled": true,
+          "decisions_made": 2,
+          "trades_executed": 2,
+          "errors": 0,
+          "avg_latency": 7.09040892124176,
+          "last_decision": "2025-10-30T11:26:06.067084",
+          "account_value": 48.915994036009,
+          "return_pct": -51.084005963991,
+          "win_rate": 0,
+          "total_trades": 2
+        },
+        {
+          "provider": "groq",
+          "priority": 2,
+          "enabled": true,
+          "decisions_made": 2,
+          "trades_executed": 2,
+          "errors": 0,
+          "avg_latency": 1.3586175441741943,
+          "last_decision": "2025-10-30T11:25:59.901887",
+          "account_value": 24.900050100025002,
+          "return_pct": -75.09994989997499,
+          "win_rate": 0,
+          "total_trades": 2
+        },
+        {
+          "provider": "anthropic",
+          "priority": 4,
+          "enabled": true,
+          "decisions_made": 2,
+          "trades_executed": 2,
+          "errors": 0,
+          "avg_latency": 22.54787290096283,
+          "last_decision": "2025-10-30T11:26:07.256944",
+          "account_value": 2.1992637890722513,
+          "return_pct": -97.80073621092775,
+          "win_rate": 0,
+          "total_trades": 2
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "session_start": "2025-10-30T11:25:14.614845",
+    "session_duration_minutes": 0.877578,
+    "total_models": 4,
+    "total_decisions": 8,
+    "leaderboard": [
+      {
+        "provider": "openai",
+        "priority": 3,
+        "enabled": true,
+        "decisions_made": 2,
+        "trades_executed": 0,
+        "errors": 2,
+        "avg_latency": 5.455832600593567,
+        "last_decision": "2025-10-30T11:26:05.375071",
+        "account_value": 100.0,
+        "return_pct": 0.0,
+        "win_rate": 0,
+        "total_trades": 0
+      },
+      {
+        "provider": "deepseek",
+        "priority": 1,
+        "enabled": true,
+        "decisions_made": 2,
+        "trades_executed": 2,
+        "errors": 0,
+        "avg_latency": 7.09040892124176,
+        "last_decision": "2025-10-30T11:26:06.067084",
+        "account_value": 48.915994036009,
+        "return_pct": -51.084005963991,
+        "win_rate": 0,
+        "total_trades": 2
+      },
+      {
+        "provider": "groq",
+        "priority": 2,
+        "enabled": true,
+        "decisions_made": 2,
+        "trades_executed": 2,
+        "errors": 0,
+        "avg_latency": 1.3586175441741943,
+        "last_decision": "2025-10-30T11:25:59.901887",
+        "account_value": 24.900050100025002,
+        "return_pct": -75.09994989997499,
+        "win_rate": 0,
+        "total_trades": 2
+      },
+      {
+        "provider": "anthropic",
+        "priority": 4,
+        "enabled": true,
+        "decisions_made": 2,
+        "trades_executed": 2,
+        "errors": 0,
+        "avg_latency": 22.54787290096283,
+        "last_decision": "2025-10-30T11:26:07.256944",
+        "account_value": 2.1992637890722513,
+        "return_pct": -97.80073621092775,
+        "win_rate": 0,
+        "total_trades": 2
+      }
+    ],
+    "leader": {
+      "provider": "openai",
+      "priority": 3,
+      "enabled": true,
+      "decisions_made": 2,
+      "trades_executed": 0,
+      "errors": 2,
+      "avg_latency": 5.455832600593567,
+      "last_decision": "2025-10-30T11:26:05.375071",
+      "account_value": 100.0,
+      "return_pct": 0.0,
+      "win_rate": 0,
+      "total_trades": 0
+    }
+  }
+}

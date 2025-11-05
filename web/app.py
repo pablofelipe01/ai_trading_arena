@@ -80,7 +80,8 @@ competition_state = {
     "paused": False,
     "round": 0,
     "session_id": None,
-    "symbol": "BTC/USDT"
+    "symbols": [],  # Multi-asset: List of all trading symbols
+    "level": "level1_multi_asset"
 }
 
 
@@ -148,10 +149,12 @@ async def start_competition(config: Dict[str, Any] = None):
         return {"error": "Competition already running"}
 
     # Create new arena
-    arena = ArenaManager(symbol=config.get("symbol", "BTC/USDT") if config else "BTC/USDT")
+    arena = ArenaManager()
 
     # Initialize
     await arena.initialize()
+
+    # Note: Symbol is configured in config.yaml, not passed to ArenaManager
 
     # Start competition in background
     arena_task = asyncio.create_task(run_competition_with_events(
@@ -161,7 +164,8 @@ async def start_competition(config: Dict[str, Any] = None):
 
     competition_state["running"] = True
     competition_state["session_id"] = arena.session_id
-    competition_state["symbol"] = arena.symbol
+    competition_state["symbols"] = arena.symbols  # All trading symbols
+    competition_state["num_assets"] = len(arena.symbols)
 
     await manager.broadcast({
         "type": "competition_started",
@@ -252,14 +256,26 @@ async def run_competition_with_events(duration_minutes: int = None, max_rounds: 
                 await arena._run_trading_round()
 
                 # Get current state
-                leaderboard = arena.get_leaderboard()
+                leaderboard = arena.llm_manager.get_leaderboard() if arena.llm_manager else []
+
+                # Transform leaderboard data to match frontend expectations
+                leaderboard_formatted = [
+                    {
+                        "model": perf.get("provider", ""),
+                        "portfolio_value": perf.get("account_value", 100.0),
+                        "total_pnl": perf.get("return_pct", 0.0),
+                        "win_rate": perf.get("win_rate", 0.0),
+                        "total_trades": perf.get("total_trades", 0)
+                    }
+                    for perf in leaderboard
+                ]
 
                 # Broadcast round complete
                 await manager.broadcast({
                     "type": "round_complete",
                     "data": {
                         "round": round_num,
-                        "leaderboard": leaderboard,
+                        "leaderboard": leaderboard_formatted,
                         "timestamp": datetime.now().isoformat()
                     }
                 })

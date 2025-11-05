@@ -206,7 +206,8 @@ Total Trades: {account_info.get('total_trades', 0)}
         if positions:
             prompt += "CURRENT POSITIONS:\n"
             for pos in positions:
-                prompt += f"  {pos['symbol']}: {pos['size']:.4f} @ ${pos['entry_price']:.2f} (PnL: {pos['pnl_pct']:.2f}%)\n"
+                pnl = pos.get('pnl_percent', 0.0)
+                prompt += f"  {pos['symbol']}: {pos['size']:.4f} @ ${pos['entry_price']:.2f} (PnL: {pnl:.2f}%)\n"
         else:
             prompt += "CURRENT POSITIONS: None\n"
 
@@ -359,6 +360,186 @@ class AdvancedTemplate(PromptTemplate):
 
 
 # ============================================================================
+# Level 1: Multi-Asset Basic Trading Template
+# ============================================================================
+
+
+class Level1MultiAssetTemplate(PromptTemplate):
+    """
+    Level 1: AI Trading Basics
+
+    Multi-asset portfolio management with simple BUY/SELL/HOLD actions.
+    Each LLM manages $100 across 8 altcoins using basic indicators:
+    - RSI (Relative Strength Index)
+    - MACD (Moving Average Convergence Divergence)
+    - EMA-20 (Exponential Moving Average)
+    - Volume
+
+    No shorting in Level 1 (coming in Level 2 with derivatives).
+    """
+
+    def __init__(self):
+        super().__init__(
+            name="level1_multi_asset",
+            description="Level 1: Multi-asset BUY/SELL/HOLD with basic indicators"
+        )
+
+    def generate(
+        self,
+        symbols: List[str],
+        market_data_all: Dict[str, Dict[str, Any]],
+        account_info: Dict[str, Any],
+        session_info: Dict[str, Any],
+        **kwargs
+    ) -> str:
+        """
+        Generate Level 1 multi-asset prompt
+
+        Args:
+            symbols: List of trading symbols
+            market_data_all: Dict of symbol → market data (prices, indicators, series)
+            account_info: Portfolio state across all assets
+            session_info: Session metadata
+
+        Returns:
+            Level 1 multi-asset prompt
+        """
+        self.logger.debug("Generating Level 1 multi-asset prompt", num_symbols=len(symbols))
+
+        # Extract session info
+        minutes_elapsed = session_info.get("minutes_elapsed", 0)
+        current_time = session_info.get("current_time", datetime.now())
+        invocations = session_info.get("invocations", 0)
+
+        # Start prompt
+        prompt = f"""LEVEL 1: AI TRADING BASICS - MULTI-ASSET PORTFOLIO
+
+It has been {minutes_elapsed} minutes since you started trading.
+Current time: {self._format_timestamp(current_time)}
+Invocations: {invocations}
+
+You have $100 TOTAL to manage across {len(symbols)} cryptocurrencies.
+Your goal: Maximize portfolio value through smart allocation.
+
+LEVEL 1 INDICATORS: RSI, MACD, EMA-20, Volume
+
+ALL DATA BELOW IS ORDERED: OLDEST → NEWEST
+
+=================================================================
+MARKET DATA - ALL {len(symbols)} ASSETS
+=================================================================
+
+"""
+
+        # Add data for each symbol
+        for symbol in symbols:
+            data = market_data_all.get(symbol, {})
+            if not data:
+                continue
+
+            current_price = data.get("current_price", 0)
+            indicators = data.get("indicators", {})
+            price_series = data.get("price_series", {})
+            indicator_series = data.get("indicator_series", {})
+
+            prompt += f"\n--- {symbol} ---\n"
+            prompt += f"Current Price: ${current_price:.2f}\n"
+            prompt += f"EMA-20: {indicators.get('ema_20', 0):.2f}, "
+            prompt += f"MACD: {indicators.get('macd', 0):.2f}, "
+            prompt += f"RSI: {indicators.get('rsi_14', 0):.1f}, "
+            prompt += f"Volume: {indicators.get('volume', 0):,.0f}\n"
+
+            # Add 3-minute price series (primary timeframe)
+            if "3m" in price_series and price_series["3m"]:
+                prices = price_series["3m"]
+                prompt += f"\nPrice Series (3m, oldest → latest):\n"
+                prompt += f"{self._format_list(prices, precision=2)}\n"
+
+            # Add indicator series
+            if "ema_20_series" in indicator_series:
+                prompt += f"EMA-20 Series: {self._format_list(indicator_series['ema_20_series'], precision=2)}\n"
+            if "macd_series" in indicator_series:
+                prompt += f"MACD Series: {self._format_list(indicator_series['macd_series'], precision=2)}\n"
+            if "rsi_14_series" in indicator_series:
+                prompt += f"RSI Series: {self._format_list(indicator_series['rsi_14_series'], precision=1)}\n"
+            if "volume_series" in indicator_series:
+                prompt += f"Volume Series: {self._format_list(indicator_series['volume_series'], precision=0)}\n"
+
+        # Add portfolio state
+        prompt += f"""
+
+=================================================================
+YOUR CURRENT PORTFOLIO
+=================================================================
+
+Total Value: ${account_info.get('total_value', 100):.2f}
+Available USDT: ${account_info.get('available_balance', 100):.2f}
+Total Return: {account_info.get('total_return_pct', 0):+.2f}%
+Win Rate: {account_info.get('win_rate', 0):.1f}%
+Total Trades: {account_info.get('total_trades', 0)}
+
+"""
+
+        # Add current positions
+        positions = account_info.get('positions', [])
+        if positions:
+            prompt += "CURRENT POSITIONS:\n"
+            for pos in positions:
+                pnl = pos.get('pnl_percent', 0.0)
+                prompt += f"  {pos['symbol']}: {pos['size']:.4f} @ ${pos['entry_price']:.2f} "
+                prompt += f"(Current: ${pos.get('current_price', pos['entry_price']):.2f}, "
+                prompt += f"PnL: {pnl:+.2f}%)\n"
+
+            # List empty positions
+            position_symbols = {p['symbol'] for p in positions}
+            empty_symbols = [s for s in symbols if s not in position_symbols]
+            if empty_symbols:
+                prompt += f"\nEMPTY POSITIONS: {', '.join([s.split('/')[0] for s in empty_symbols])}\n"
+        else:
+            prompt += "CURRENT POSITIONS: None (all USDT)\n"
+
+        # Add decision instructions
+        prompt += """
+
+=================================================================
+DECISION REQUEST
+=================================================================
+
+Based on the market data above, make trading decisions for your portfolio.
+You can trade ANY of the assets. Focus on 1-3 assets per round for best results.
+
+IMPORTANT: You must BUY before you can SELL. SELL closes existing positions.
+
+Respond with a JSON array of decisions (or focus on 1-2 assets):
+
+[
+  {
+    "symbol": "ETH/USDT",
+    "action": "BUY" | "SELL" | "HOLD",
+    "confidence": 0.0-1.0,
+    "reasoning": "Why this decision based on RSI, MACD, EMA-20, Volume",
+    "position_size": 0.0-1.0
+  },
+  {
+    "symbol": "SOL/USDT",
+    "action": "SELL",
+    "confidence": 0.75,
+    "reasoning": "Taking profit on SOL position, RSI overbought at 72",
+    "position_size": 1.0
+  }
+]
+
+Remember:
+- BUY: Use fraction of available USDT (position_size: 0.3 = use 30% of cash)
+- SELL: Close fraction of existing position (position_size: 1.0 = close 100%)
+- HOLD: Do nothing for this asset
+
+Your decisions:"""
+
+        return prompt
+
+
+# ============================================================================
 # Prompt Template Manager
 # ============================================================================
 
@@ -385,6 +566,7 @@ class PromptTemplateManager:
             "nof1_exact": NOF1ExactTemplate(),
             "simplified": SimplifiedTemplate(),
             "advanced": AdvancedTemplate(),
+            "level1_multi_asset": Level1MultiAssetTemplate(),
         }
 
         self.logger.info(

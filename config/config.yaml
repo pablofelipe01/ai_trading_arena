@@ -1,118 +1,82 @@
-# ============================================================================
-# AI Trading Arena - Configuration
-# ============================================================================
-# This file contains all configuration for the trading arena
-# Values can be overridden via environment variables (see .env)
-# ============================================================================
+# AI Trading Arena Configuration
+# This config file defines all system parameters
 
-# ----------------------------------------------------------------------------
-# Trading Configuration
-# ----------------------------------------------------------------------------
+meta:
+  version: "0.1.0"
+  phase: "FASE_4_TESTING"
+  last_updated: "2025-10-29"
+  nof1_compatible: true
+
 trading:
-  mode: "paper"  # paper | live (ALWAYS start with paper!)
-  capital_per_model: 100  # USD starting capital per model
-
-  # Risk Management
+  mode: "paper"  # ALWAYS start with paper!
+  capital_per_model: 100.0
   risk:
-    max_risk_per_trade: 0.02  # 2% max risk per single trade
-    max_position_size: 0.20   # 20% max of capital per position
-    max_daily_loss: 0.05      # 5% daily loss triggers circuit breaker
+    max_risk_per_trade: 0.02
+    max_position_size: 0.20
+    max_daily_loss: 0.05
     enable_circuit_breaker: true
     enable_emergency_stop: true
-
-  # Execution
   execution:
-    slippage_simulation: 0.001  # 0.1% simulated slippage in paper mode
-    commission_rate: 0.001      # 0.1% commission (Binance standard)
-    min_order_size_usd: 10      # Minimum order size
+    slippage_simulation: 0.001
+    commission_rate: 0.001
+    min_order_size_usd: 10.0
 
-# ----------------------------------------------------------------------------
-# Exchange Configuration
-# ----------------------------------------------------------------------------
 exchange:
   name: "binance"
-  testnet: true  # Use testnet for paper trading
-
-  # Symbols to trade
+  testnet: true
   symbols:
-    - "BTC/USDT"
-    # Future expansion:
-    # - "ETH/USDT"
-    # - "SOL/USDT"
-
-  # Rate limiting
+    # Level 1: AI Trading Basics - 8 major altcoins (NO BTC)
+    - "ETH/USDT"   # Ethereum
+    - "SOL/USDT"   # Solana
+    - "BNB/USDT"   # Binance Coin
+    - "ADA/USDT"   # Cardano
+    - "XRP/USDT"   # Ripple
+    - "DOGE/USDT"  # Dogecoin
+    - "POL/USDT"   # Polygon (formerly MATIC)
+    - "AVAX/USDT"  # Avalanche
   rate_limits:
     requests_per_minute: 1200
     order_per_second: 10
     weight_per_minute: 6000
 
-# ----------------------------------------------------------------------------
-# Data Configuration (nof1.ai style)
-# ----------------------------------------------------------------------------
 data:
-  # Timeframes for analysis (nof1.ai uses multiple timeframes)
   timeframes:
-    primary: "3m"  # Main decision timeframe (like nof1.ai)
+    primary: "3m"
     context:
-      - "1m"   # High resolution
-      - "15m"  # Medium trend
-      - "1h"   # Larger trend
-      - "4h"   # Macro context
-
-  # How many candles to fetch per timeframe
+      - "1m"
+      - "15m"
+      - "1h"
+      - "4h"
   candle_limits:
-    "1m": 60    # Last 1 hour
-    "3m": 100   # Last 5 hours (nof1 standard)
-    "15m": 96   # Last 24 hours
-    "1h": 168   # Last week
-    "4h": 180   # Last month
-
-  # Technical Indicators (nof1.ai configuration)
+    "1m": 60
+    "3m": 100
+    "15m": 96
+    "1h": 168
+    "4h": 180
   indicators:
     ema:
       periods: [20, 50]
-
     macd:
       fast: 12
       slow: 26
       signal: 9
-
     rsi:
-      periods: [7, 14]  # nof1 uses both 7 and 14
-
+      periods: [7, 14]
     atr:
       periods: [3, 14]
-
-    # Additional data points
     include_volume: true
-    include_funding_rate: true  # Futures funding rate
-    include_open_interest: true  # Futures open interest
-
-  # Data freshness
+    include_funding_rate: true
+    include_open_interest: true
   cache:
     enabled: true
-    ttl_seconds: 60  # Cache for 1 minute
+    ttl_seconds: 60
+  ordering: "oldest_to_newest"
 
-  # Data ordering (CRITICAL for nof1 compatibility)
-  ordering: "oldest_to_newest"  # NEVER change this!
-
-# ----------------------------------------------------------------------------
-# Prompt Configuration
-# ----------------------------------------------------------------------------
 prompts:
-  # Template version selection
-  template_version: "nof1_exact"  # nof1_exact | simplified | advanced | minimal
-
-  # Template paths
+  template_version: "nof1_exact"
   templates_dir: "strategies/templates"
-
-  # Prompt variations (for A/B testing in future)
   enable_ab_testing: false
-
-  # Context window management
-  max_tokens: 8000  # Approximate max context per prompt
-
-  # Include/exclude sections
+  max_tokens: 8000
   sections:
     include_market_state: true
     include_price_series: true
@@ -122,153 +86,114 @@ prompts:
     include_recent_performance: true
     include_portfolio_state: true
 
-# ----------------------------------------------------------------------------
-# LLM Models Configuration (Tier 1 - Priority)
-# ----------------------------------------------------------------------------
+# LLM Models Configuration
 models:
-  # DeepSeek - The nof1.ai Champion (+11.06%)
+  # DeepSeek - Winner of nof1.ai (+11.06%)
   deepseek:
     enabled: true
     priority: 1  # Highest priority
-
     api:
-      base_url: "https://api.deepseek.com"
+      base_url: "https://api.deepseek.com/v1"
       model: "deepseek-chat"
       timeout: 30
-
     parameters:
       temperature: 0.7
       max_tokens: 2000
       top_p: 0.95
-
+      max_retries: 3
+      retry_delay: 2
+      max_requests_per_minute: 100
     rate_limit:
       calls_per_minute: 100
-
     cost:
       input_per_1m_tokens: 0.14
       output_per_1m_tokens: 0.28
-
     metadata:
-      narrative: "🏆 The Champion Defends (+11.06% on nof1.ai)"
-      color: "#1E90FF"
+      narrative: "Winner of nof1.ai with +11.06% returns"
+      color: "#4CAF50"
 
-  # Llama 3 70B - The Open Source Underdog (FREE via Groq)
-  llama:
-    enabled: true
-    priority: 2
-
-    api:
-      provider: "groq"  # groq | together
-      base_url: "https://api.groq.com/openai/v1"
-      model: "llama3-70b-8192"
-      timeout: 30
-
-    parameters:
-      temperature: 0.7
-      max_tokens: 2000
-      top_p: 0.95
-
-    rate_limit:
-      calls_per_minute: 30  # Free tier
-
-    cost:
-      input_per_1m_tokens: 0.0  # FREE!
-      output_per_1m_tokens: 0.0
-
-    metadata:
-      narrative: "🦙 The Open Source Underdog"
-      color: "#FF6B6B"
-
-  # GPT-4 Turbo - The Favorite Seeks Revenge
-  gpt4:
+  # OpenAI GPT-4
+  openai:
     enabled: true
     priority: 3
-
     api:
       base_url: "https://api.openai.com/v1"
-      model: "gpt-4-turbo-preview"
+      model: "gpt-4o"
       timeout: 30
-
     parameters:
       temperature: 0.7
       max_tokens: 2000
       top_p: 0.95
-
+      max_retries: 3
+      retry_delay: 2
+      max_requests_per_minute: 60
     rate_limit:
-      calls_per_minute: 500
-
+      calls_per_minute: 60
     cost:
-      input_per_1m_tokens: 10.0
-      output_per_1m_tokens: 30.0
-
+      input_per_1m_tokens: 2.50
+      output_per_1m_tokens: 10.00
     metadata:
-      narrative: "🤖 The Favorite Seeks Revenge"
-      color: "#00D4AA"
+      narrative: "OpenAI GPT-4o - The industry standard"
+      color: "#00A67E"
 
-  # Claude 3 Sonnet - The Professional Analyst
-  claude:
-    enabled: true
+  # Anthropic Claude
+  anthropic:
+    enabled: true  # Re-enabled with new API key and correct model
     priority: 4
-
     api:
-      base_url: "https://api.anthropic.com"
-      model: "claude-3-sonnet-20240229"
-      timeout: 30
-
+      base_url: "https://api.anthropic.com/v1"
+      model: "claude-sonnet-4-5-20250929"  # Claude Sonnet 4.5 (current flagship)
+      timeout: 60
     parameters:
       temperature: 0.7
       max_tokens: 2000
       top_p: 0.95
-
+      max_retries: 3
+      retry_delay: 2
+      max_requests_per_minute: 50
     rate_limit:
       calls_per_minute: 50
-
     cost:
-      input_per_1m_tokens: 3.0
-      output_per_1m_tokens: 15.0
-
+      input_per_1m_tokens: 3.00
+      output_per_1m_tokens: 15.00
     metadata:
-      narrative: "🧠 The Professional Analyst"
-      color: "#9B59B6"
+      narrative: "Claude Sonnet 4.5 - Advanced reasoning"
+      color: "#CC785C"
 
-# ----------------------------------------------------------------------------
-# LLM Models - Tier 2 (Future Expansion)
-# ----------------------------------------------------------------------------
-  # Gemini Pro
-  gemini:
-    enabled: false
-    priority: 5
+  # Groq (Llama 3.3)
+  groq:
+    enabled: true
+    priority: 2
+    api:
+      base_url: "https://api.groq.com/openai/v1"
+      model: "llama-3.3-70b-versatile"
+      timeout: 30
+      provider: "groq"
+    parameters:
+      temperature: 0.7
+      max_tokens: 2000
+      top_p: 0.95
+      max_retries: 3
+      retry_delay: 2
+      max_requests_per_minute: 120
+    rate_limit:
+      calls_per_minute: 120
+    cost:
+      input_per_1m_tokens: 0.0  # Free tier
+      output_per_1m_tokens: 0.0
     metadata:
-      narrative: "💫 The Power of Google"
-      color: "#4285F4"
+      narrative: "Llama 3.3 via Groq - Ultra-fast inference"
+      color: "#F55036"
 
-  # Qwen
-  qwen:
-    enabled: false
-    priority: 6
-    metadata:
-      narrative: "🐉 The Dragon of the East"
-      color: "#FF4444"
-
-# ----------------------------------------------------------------------------
-# Arena Manager Configuration
-# ----------------------------------------------------------------------------
 arena:
-  # Decision timing (nof1.ai uses 3-minute intervals)
-  decision_interval: 180  # seconds (3 minutes)
-
-  # Execution
+  decision_interval: 180  # 3 minutes like nof1.ai (use 5 for quick testing)
   parallel_execution: true
   max_concurrent_llm_calls: 4
-
-  # Competition duration
   session_duration:
-    default: 86400  # 24 hours in seconds
-    max: 2592000    # 30 days max
-
-  # Leaderboard
+    default: 86400  # 24 hours
+    max: 2592000  # 30 days
   leaderboard:
-    update_frequency: 300  # Update every 5 minutes
+    update_frequency: 300
     metrics:
       - "total_return_pct"
       - "sharpe_ratio"
@@ -276,97 +201,26 @@ arena:
       - "max_drawdown"
       - "total_trades"
       - "avg_trade_duration"
-
-  # Results persistence
   persistence:
     save_decisions: true
     save_prompts: true
     save_responses: true
-    export_format: ["json", "csv"]
+    export_format:
+      - "json"
+      - "csv"
 
-# ----------------------------------------------------------------------------
-# Logging Configuration
-# ----------------------------------------------------------------------------
 logging:
-  level: "INFO"  # DEBUG | INFO | WARNING | ERROR | CRITICAL
-
-  # Console output
+  level: "INFO"
   console:
     enabled: true
     colorize: true
     format: "<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan> - <level>{message}</level>"
-
-  # File output
   file:
     enabled: true
     path: "data/logs/arena.log"
     rotation: "100 MB"
     retention: "30 days"
     compression: "zip"
-
-  # Structured logging
   structured:
     enabled: true
     path: "data/logs/structured.jsonl"
-
-# ----------------------------------------------------------------------------
-# Testing Configuration
-# ----------------------------------------------------------------------------
-testing:
-  # Unit tests
-  pytest:
-    verbose: true
-    coverage_min: 80
-
-  # Property-based testing
-  hypothesis:
-    enabled: true
-    max_examples: 100
-    deadline: 1000  # milliseconds
-
-  # Integration tests
-  integration:
-    use_mock_exchange: true
-    use_mock_llm: false  # Use real LLM APIs in integration tests
-    test_duration: 3600  # 1 hour
-
-# ----------------------------------------------------------------------------
-# Monitoring & Alerts
-# ----------------------------------------------------------------------------
-monitoring:
-  # Performance tracking
-  metrics:
-    enabled: true
-    collection_interval: 60
-
-  # Alerts (future implementation)
-  alerts:
-    enabled: false
-    # telegram:
-    #   enabled: false
-    # email:
-    #   enabled: false
-
-# ----------------------------------------------------------------------------
-# Development Settings
-# ----------------------------------------------------------------------------
-development:
-  debug_mode: false
-  mock_trading: false
-  fast_mode: false  # Speed up intervals for testing
-
-  # Fast mode settings (for development only)
-  fast_mode_config:
-    decision_interval: 10  # 10 seconds instead of 3 minutes
-    candle_limits:
-      "1m": 10
-      "3m": 20
-
-# ----------------------------------------------------------------------------
-# Version Info
-# ----------------------------------------------------------------------------
-meta:
-  version: "0.1.0"
-  phase: "PHASE_0_COMPLETE"
-  last_updated: "2025-10-28"
-  nof1_compatible: true
